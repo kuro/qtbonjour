@@ -4,6 +4,8 @@ set(sources
     BonjourRecord.cpp
     BonjourBrowser.h
     BonjourBrowser.cpp
+    BonjourResolver.h
+    BonjourResolver.cpp
     )
 
 include_directories(
