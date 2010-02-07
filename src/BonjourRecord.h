@@ -15,7 +15,7 @@ public:
     BonjourRecord ();
     BonjourRecord (const QString& serviceName,
                    const QString& registeredType,
-                   const QString& replyDomain);
+                   const QString& replyDomain = QString());
     BonjourRecord (const char* serviceName,
                    const char* registeredType,
                    const char* replyDomain);

@@ -70,6 +70,7 @@ void BonjourBrowser::bonjourBrowseReply (
             } else {
                 browser->d->bonjourRecords.removeAll(record);
             }
+            emit browser->recordFound(record);
             if (!(flags & kDNSServiceFlagsMoreComing)) {
                 emit browser->currentBonjourRecordsChanged(
                     browser->d->bonjourRecords);

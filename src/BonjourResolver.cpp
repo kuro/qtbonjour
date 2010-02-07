@@ -9,6 +9,7 @@
 
 #include <QSocketNotifier>
 #include <QHostInfo>
+#include <QtEndian>
 #include <QDebug>
 
 struct BonjourResolver::Private
@@ -97,10 +98,7 @@ void BonjourResolver::bonjourResolveReply (
         emit resolver->error(err);
         return;
     }
-#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-    port = ((port & 0x00ff) << 8) | ((port & 0xff00) >> 8);
-#endif
-    resolver->d->port = port;
+    resolver->d->port = qFromBigEndian(port);
     QHostInfo::lookupHost(QString::fromUtf8(hostTarget),
                           resolver, SLOT(finishConnect(const QHostInfo &)));
 }

@@ -36,7 +36,8 @@ private slots:
 private:
     static void DNSSD_API bonjourResolveReply (
         DNSServiceRef, DNSServiceFlags, quint32, DNSServiceErrorType,
-        const char*, const char*, quint16, quint16, const unsigned char*, void*);
+        const char*, const char*, quint16, quint16, const unsigned char*, void*
+        );
 
 private:
     struct Private;

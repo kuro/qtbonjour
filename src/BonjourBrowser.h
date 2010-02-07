@@ -25,6 +25,7 @@ public:
     QString serviceType () const;
 
 signals:
+    void recordFound (const BonjourRecord& record);
     void currentBonjourRecordsChanged (const QList<BonjourRecord>& list);
     void error (DNSServiceErrorType err);
 
