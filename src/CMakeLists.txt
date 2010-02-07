@@ -16,4 +16,4 @@ include_directories(
 
 qt4_automoc(${sources})
 
-add_library(salut ${sources})
+add_library(bonjour ${sources})
