@@ -1,6 +1,4 @@
 
-add_custom_target(doc)
-
 find_package(Doxygen)
 
 configure_file(
