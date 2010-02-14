@@ -24,6 +24,8 @@ public:
 
     void resolve (const BonjourRecord& record);
 
+    DNSServiceErrorType error () const;
+
 signals:
     void recordResolved (const QHostInfo& hostInfo, quint16 port);
     void error (DNSServiceErrorType err);
@@ -38,6 +40,8 @@ private:
         DNSServiceRef, DNSServiceFlags, quint32, DNSServiceErrorType,
         const char*, const char*, quint16, quint16, const unsigned char*, void*
         );
+
+    void setError (DNSServiceErrorType err);
 
 private:
     struct Private;

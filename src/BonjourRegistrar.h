@@ -22,6 +22,8 @@ public:
 
     void registerService (const BonjourRecord& record, quint16 port);
 
+    DNSServiceErrorType error () const;
+
 signals:
     void serviceRegistered (const BonjourRecord& record);
     void error (DNSServiceErrorType err);
@@ -34,6 +36,8 @@ private:
         DNSServiceRef, DNSServiceFlags, DNSServiceErrorType,
         const char*, const char*, const char*, void*
         );
+
+    void setError (DNSServiceErrorType err);
 
 private:
     struct Private;

@@ -24,6 +24,8 @@ public:
     QList<BonjourRecord> currentRecords () const;
     QString serviceType () const;
 
+    DNSServiceErrorType error () const;
+
 signals:
     void recordFound (const BonjourRecord& record);
     void currentBonjourRecordsChanged (const QList<BonjourRecord>& list);
@@ -36,6 +38,8 @@ private:
     static void DNSSD_API bonjourBrowseReply (
         DNSServiceRef, DNSServiceFlags, quint32, DNSServiceErrorType,
         const char*, const char*, const char*, void*);
+
+    void setError (DNSServiceErrorType err);
 
 private:
     struct Private;

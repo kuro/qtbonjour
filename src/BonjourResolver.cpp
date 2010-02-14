@@ -18,10 +18,13 @@ struct BonjourResolver::Private
     QSocketNotifier *bonjourSocket;
     quint16 port;
 
+    DNSServiceErrorType errorCode;
+
     Private () :
         dnssref(NULL),
         bonjourSocket(NULL),
-        port(0)
+        port(0),
+        errorCode(kDNSServiceErr_NoError)
     {
     }
 };
@@ -50,11 +53,11 @@ void BonjourResolver::resolve (const BonjourRecord& record)
                             record.replyDomain().toUtf8().constData(),
                             bonjourResolveReply, this);
     if (err != kDNSServiceErr_NoError) {
-        emit error(err);
+        setError(err);
     } else {
         int sockfd = DNSServiceRefSockFD(d->dnssref);
         if (sockfd == -1) {
-            emit error(kDNSServiceErr_Invalid);
+            setError(kDNSServiceErr_Invalid);
         } else {
             d->bonjourSocket = new QSocketNotifier(
                 sockfd, QSocketNotifier::Read, this);
@@ -69,7 +72,7 @@ void BonjourResolver::bonjourSocketReadyRead ()
     DNSServiceErrorType err;
     err = DNSServiceProcessResult(d->dnssref);
     if (err != kDNSServiceErr_NoError) {
-        emit error(err);
+        setError(err);
     }
 }
 
@@ -95,10 +98,21 @@ void BonjourResolver::bonjourResolveReply (
 {
     BonjourResolver* resolver = static_cast<BonjourResolver*>(context);
     if (err != kDNSServiceErr_NoError) {
-        emit resolver->error(err);
+        resolver->setError(err);
         return;
     }
     resolver->d->port = qFromBigEndian(port);
     QHostInfo::lookupHost(QString::fromUtf8(hostTarget),
                           resolver, SLOT(finishConnect(const QHostInfo &)));
+}
+
+DNSServiceErrorType BonjourResolver::error () const
+{
+    return d->errorCode;
+}
+
+void BonjourResolver::setError (DNSServiceErrorType err)
+{
+    d->errorCode = err;
+    emit error(err);
 }
