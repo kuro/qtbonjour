@@ -10,24 +10,28 @@
 #include <QSocketNotifier>
 #include <QHostInfo>
 #include <QtEndian>
+#include <QBuffer>
 #include <QDebug>
 
 struct BonjourResolver::Private
 {
     DNSServiceRef dnssref;
     QSocketNotifier *bonjourSocket;
-    quint16 port;
-
-    QPair<QHostInfo, quint16> last;
 
     DNSServiceErrorType errorCode;
+
+    struct {
+        QHostInfo hostInfo;
+        quint16 port;
+        QHash<QString, QString> text;
+    } last;
 
     Private () :
         dnssref(NULL),
         bonjourSocket(NULL),
-        port(0),
         errorCode(kDNSServiceErr_NoError)
     {
+        last.port = 0;
     }
 };
 
@@ -84,32 +88,53 @@ void BonjourResolver::cleanupResolve ()
         DNSServiceRefDeallocate(d->dnssref);
         d->dnssref = NULL;
         delete d->bonjourSocket;
-        d->port = 0;
+        d->last.port = 0;
     }
 }
 
-QPair<QHostInfo, quint16> BonjourResolver::lastResult () const
+void BonjourResolver::last (QHostInfo& hostInfo, quint16& port,
+                            QHash<QString, QString>& text) const
 {
-    return d->last;
+    hostInfo = d->last.hostInfo;
+    port = d->last.port;
+    text = d->last.text;
 }
 
 void BonjourResolver::finishConnect (const QHostInfo& hostInfo)
 {
-    d->last = qMakePair(hostInfo, d->port);
-    emit recordResolved(hostInfo, d->port);
+    d->last.hostInfo = hostInfo;
+    emit recordResolved(d->last.hostInfo, d->last.port, d->last.text);
     QMetaObject::invokeMethod(this, "cleanupResolve", Qt::QueuedConnection);
 }
 
 void BonjourResolver::bonjourResolveReply (
     DNSServiceRef, DNSServiceFlags, quint32, DNSServiceErrorType err,
-    const char*, const char* hostTarget, quint16 port, quint16, const unsigned char*, void* context)
+    const char* fullName,
+    const char* hostTarget, quint16 port,
+    quint16 textLength, const unsigned char* textRecord,
+    void* context)
 {
     BonjourResolver* resolver = static_cast<BonjourResolver*>(context);
     if (err != kDNSServiceErr_NoError) {
         resolver->setError(err);
         return;
     }
-    resolver->d->port = qFromBigEndian(port);
+
+    resolver->d->last.text.clear();
+    QBuffer dev;
+    dev.setData((char*)textRecord, textLength);
+    dev.open(QIODevice::ReadOnly);
+    while (!dev.atEnd()) {
+        quint8 len;
+        dev.read((char*)&len, sizeof(len));
+        QByteArray record = dev.read(len);
+        QList<QByteArray> parts = record.split('=');
+        resolver->d->last.text.insert(QString::fromLocal8Bit(parts[0]),
+                                      QString::fromLocal8Bit(parts[1]));
+    }
+    dev.close();
+
+    resolver->d->last.port = qFromBigEndian(port);
     QHostInfo::lookupHost(QString::fromUtf8(hostTarget),
                           resolver, SLOT(finishConnect(const QHostInfo &)));
 }

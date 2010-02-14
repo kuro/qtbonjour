@@ -114,7 +114,8 @@ void BonjourRecord::resolve (QObject* receiver,
     Q_CHECK_PTR(resolver);
 
     QObject::connect(resolver,
-                     SIGNAL(recordResolved(const QHostInfo&, quint16)),
+                     SIGNAL(recordResolved(const QHostInfo&, quint16,
+                                           const QHash<QString, QString>&)),
                      receiver,
                      member);
 
@@ -132,7 +133,8 @@ void BonjourRecord::resolve (QObject* receiver,
                      SLOT(deleteLater()));
 
     QObject::connect(resolver,
-                     SIGNAL(recordResolved(const QHostInfo&, quint16)),
+                     SIGNAL(recordResolved(const QHostInfo&, quint16,
+                                           const QHash<QString, QString>&)),
                      resolver,
                      SLOT(deleteLater()));
 

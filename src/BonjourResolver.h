@@ -26,10 +26,14 @@ public:
 
     DNSServiceErrorType error () const;
 
-    QPair<QHostInfo, quint16> lastResult () const;
+    /**
+     * @brief Store the last result into the given variables.
+     */
+    void last (QHostInfo&, quint16&, QHash<QString, QString>&) const;
 
 signals:
-    void recordResolved (const QHostInfo& hostInfo, quint16 port);
+    void recordResolved (const QHostInfo& hostInfo, quint16 port,
+                         const QHash<QString, QString>& txt);
     void error (DNSServiceErrorType err);
 
 private slots:
