@@ -9,6 +9,8 @@
 
 #include <QSocketNotifier>
 #include <QtEndian>
+#include <QHashIterator>
+#include <QBuffer>
 #include <QDebug>
 
 struct BonjourRegistrar::Private
@@ -39,12 +41,36 @@ BonjourRegistrar::~BonjourRegistrar ()
 
 void BonjourRegistrar::registerService (const BonjourRecord& record, quint16 port)
 {
+    QHash<QString, QString> txt;
+    registerService(record, port, txt);
+}
+
+void BonjourRegistrar::registerService (
+    const BonjourRecord& record, quint16 port,
+    const QHash<QString, QString>& txt)
+{
     if (d->dnssref) {
         qWarning("Warning: Already registered a service for this object, aborting new register");
         return;
     }
 
     DNSServiceErrorType err;
+
+    QByteArray buf;
+    QBuffer dev (&buf);
+    dev.open(QIODevice::WriteOnly);
+    QHashIterator<QString, QString> it (txt);
+    while (it.hasNext()) {
+        it.next();
+        QString key = it.key();
+        QString value = it.value();
+        quint8 len = key.size() + value.size() + 1;
+        dev.write((char*)&len, sizeof(len));
+        dev.write(it.key().toLocal8Bit());
+        dev.write("=");
+        dev.write(it.value().toLocal8Bit());
+    }
+    dev.close();
 
     err = DNSServiceRegister(
         &d->dnssref, 0, 0,
@@ -53,7 +79,9 @@ void BonjourRegistrar::registerService (const BonjourRecord& record, quint16 por
         record.replyDomain().isEmpty()
             ? 0 : record.replyDomain().toUtf8().constData(),
         0,
-        qToBigEndian(port), 0, 0, bonjourRegisterService, this);
+        qToBigEndian(port),
+        buf.size(), buf.data(),
+        bonjourRegisterService, this);
 
     if (err != kDNSServiceErr_NoError) {
         setError(err);

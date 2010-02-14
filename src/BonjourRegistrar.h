@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <QObject>
+#include <QHash>
 
 #include <dns_sd.h>
 
@@ -21,6 +21,10 @@ public:
     virtual ~BonjourRegistrar ();
 
     void registerService (const BonjourRecord& record, quint16 port);
+
+    void registerService (
+        const BonjourRecord& record, quint16 port,
+        const QHash<QString, QString>& txt);
 
     DNSServiceErrorType error () const;
 
