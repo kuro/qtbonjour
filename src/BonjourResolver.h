@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <QObject>
+#include <QPair>
 
 #include <dns_sd.h>
 
@@ -25,6 +25,8 @@ public:
     void resolve (const BonjourRecord& record);
 
     DNSServiceErrorType error () const;
+
+    QPair<QHostInfo, quint16> lastResult () const;
 
 signals:
     void recordResolved (const QHostInfo& hostInfo, quint16 port);

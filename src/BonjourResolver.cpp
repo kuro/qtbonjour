@@ -18,6 +18,8 @@ struct BonjourResolver::Private
     QSocketNotifier *bonjourSocket;
     quint16 port;
 
+    QPair<QHostInfo, quint16> last;
+
     DNSServiceErrorType errorCode;
 
     Private () :
@@ -86,8 +88,14 @@ void BonjourResolver::cleanupResolve ()
     }
 }
 
+QPair<QHostInfo, quint16> BonjourResolver::lastResult () const
+{
+    return d->last;
+}
+
 void BonjourResolver::finishConnect (const QHostInfo& hostInfo)
 {
+    d->last = qMakePair(hostInfo, d->port);
     emit recordResolved(hostInfo, d->port);
     QMetaObject::invokeMethod(this, "cleanupResolve", Qt::QueuedConnection);
 }
