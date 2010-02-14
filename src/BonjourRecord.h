@@ -9,6 +9,10 @@
 #include <QSharedDataPointer>
 #include <QVariant>
 
+#include <dns_sd.h>
+
+class QHostInfo;
+
 class BonjourRecord
 {
 public:
@@ -32,6 +36,10 @@ public:
 
     bool operator== (const BonjourRecord& other) const;
     BonjourRecord& operator= (const BonjourRecord& other);
+
+    void resolve (QObject* receiver,
+                  const char* member,
+                  const char* errorMember = NULL);
 
 private:
     struct Private;

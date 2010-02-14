@@ -6,6 +6,8 @@
 
 #include "BonjourRecord.h"
 
+#include "BonjourResolver.h"
+
 #include <QString>
 
 struct BonjourRecord::Private : public QSharedData
@@ -101,4 +103,39 @@ bool BonjourRecord::operator== (const BonjourRecord& other) const
         d->registeredType == other.registeredType() &&
         d->replyDomain == other.replyDomain()
         ;
+}
+
+void BonjourRecord::resolve (QObject* receiver,
+                             const char* member,
+                             const char* errorMember)
+{
+    BonjourResolver* resolver = NULL;
+    resolver = new BonjourResolver(receiver);
+    Q_CHECK_PTR(resolver);
+
+    QObject::connect(resolver,
+                     SIGNAL(recordResolved(const QHostInfo&, quint16)),
+                     receiver,
+                     member);
+
+    if (errorMember) {
+        QObject::connect(resolver,
+                         SIGNAL(error(DNSServiceErrorType)),
+                         receiver,
+                         errorMember);
+    }
+
+    // clean up in the future
+    QObject::connect(resolver,
+                     SIGNAL(error(DNSServiceErrorType)),
+                     resolver,
+                     SLOT(deleteLater()));
+
+    QObject::connect(resolver,
+                     SIGNAL(recordResolved(const QHostInfo&, quint16)),
+                     resolver,
+                     SLOT(deleteLater()));
+
+    // resolve
+    resolver->resolve(*this);
 }
