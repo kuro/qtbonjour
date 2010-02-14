@@ -2,15 +2,15 @@
 find_package(Doxygen)
 
 configure_file(
-    bonjour.dox.in
-    ${CMAKE_CURRENT_BINARY_DIR}/bonjour.dox
+    qtbonjour.dox.in
+    ${CMAKE_CURRENT_BINARY_DIR}/qtbonjour.dox
     )
 
 if (DOXYGEN_FOUND)
     add_custom_target(
-        bonjour-doc
-        ${DOXYGEN_EXECUTABLE} bonjour.dox
+        qtbonjour-doc
+        ${DOXYGEN_EXECUTABLE} qtbonjour.dox
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
-    add_dependencies(doc bonjour-doc)
+    add_dependencies(doc qtbonjour-doc)
 endif()
