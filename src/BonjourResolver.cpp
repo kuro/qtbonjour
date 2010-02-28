@@ -108,10 +108,10 @@ void BonjourResolver::finishConnect (const QHostInfo& hostInfo)
 }
 
 void BonjourResolver::bonjourResolveReply (
-    DNSServiceRef, DNSServiceFlags, quint32, DNSServiceErrorType err,
+    DNSServiceRef, DNSServiceFlags, uint32_t, DNSServiceErrorType err,
     const char* fullName,
-    const char* hostTarget, quint16 port,
-    quint16 textLength, const unsigned char* textRecord,
+    const char* hostTarget, uint16_t port,
+    uint16_t textLength, const char* textRecord,
     void* context)
 {
     BonjourResolver* resolver = static_cast<BonjourResolver*>(context);
