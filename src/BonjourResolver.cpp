@@ -57,7 +57,7 @@ void BonjourResolver::resolve (const BonjourRecord& record)
                             record.serviceName().toUtf8().constData(),
                             record.registeredType().toUtf8().constData(),
                             record.replyDomain().toUtf8().constData(),
-                            bonjourResolveReply, this);
+                            (DNSServiceResolveReply)bonjourResolveReply, this);
     if (err != kDNSServiceErr_NoError) {
         setError(err);
     } else {
