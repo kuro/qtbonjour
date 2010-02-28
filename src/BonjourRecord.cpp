@@ -60,6 +60,7 @@ BonjourRecord::BonjourRecord (const BonjourRecord& other) :
 BonjourRecord& BonjourRecord::operator= (const BonjourRecord& other)
 {
     d = other.d;
+    return *this;
 }
 
 BonjourRecord::~BonjourRecord ()
