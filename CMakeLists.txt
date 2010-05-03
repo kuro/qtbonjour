@@ -9,3 +9,5 @@ endif ()
 
 subdirs(src doc)
 subdirs(test)
+
+configure_file(QtBonjourConfig.cmake.in QtBonjourConfig.cmake @ONLY)

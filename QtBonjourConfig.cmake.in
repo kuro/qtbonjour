@@ -1,0 +1,20 @@
+find_path(BONJOUR_INCLUDE_DIR
+    NAMES dns_sd.h
+    PATHS
+    "C:/Program Files/Bonjour SDK/Include"
+    )
+
+set(QTBONJOUR_INCLUDE_DIR @CMAKE_CURRENT_SOURCE_DIR@/src ${BONJOUR_INCLUDE_DIR})
+set(QTBONJOUR_LIBRARIES   @CMAKE_CURRENT_BINARY_DIR@/src/@CMAKE_STATIC_LIBRARY_PREFIX@QtBonjour@CMAKE_STATIC_LIBRARY_SUFFIX@)
+
+if (NOT APPLE)
+    find_library(BONJOUR_LIBRARY
+        NAMES dnssd
+        PATHS
+        "C:/Program Files/Bonjour SDK/lib/win32"
+        )
+
+    set(QTBONJOUR_LIBRARIES ${QTBONJOUR_LIBRARIES} ${BONJOUR_LIBRARY})
+endif()
+
+set(QTBONJOUR_FOUND TRUE)
