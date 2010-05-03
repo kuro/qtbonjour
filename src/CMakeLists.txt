@@ -1,12 +1,15 @@
 
-set(sources
+set(headers
     BonjourRecord.h
-    BonjourRecord.cpp
     BonjourBrowser.h
-    BonjourBrowser.cpp
     BonjourResolver.h
-    BonjourResolver.cpp
     BonjourRegistrar.h
+    )
+
+set(sources
+    BonjourRecord.cpp
+    BonjourBrowser.cpp
+    BonjourResolver.cpp
     BonjourRegistrar.cpp
     )
 
@@ -24,3 +27,11 @@ include_directories(
 qt4_automoc(${sources})
 
 add_library(QtBonjour ${sources})
+
+install(FILES ${headers}
+    DESTINATION include/QtBonjour
+    )
+
+install(TARGETS QtBonjour
+    DESTINATION lib
+    )
